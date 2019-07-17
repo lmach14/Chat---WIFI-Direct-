@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase;
 
 
 
-//@androidx.room.Database(entities = {DataMainEntity.class, DataItemsEntity.class}, version = 1)
+@androidx.room.Database(entities = {MessageEntity.class, ChatEntity.class}, version = 1)
 public abstract class DataBase extends RoomDatabase {
 
     private static final String DATABASE_NAME = "app_database";
