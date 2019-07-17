@@ -20,6 +20,14 @@ public class MessageEntity {
     @ColumnInfo(name = "message")
     private String message;
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     @ColumnInfo(name = "date")
     private String date;
 
