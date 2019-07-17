@@ -20,10 +20,14 @@ public class MessageEntity {
     @ColumnInfo(name = "message")
     private String message;
 
-    public MessageEntity(boolean is_sender, String message, long chat_id) {
+    @ColumnInfo(name = "date")
+    private String date;
+
+    public MessageEntity(long chat_id, String message, boolean is_sender, String date) {
         this.chat_id = chat_id;
         this.is_sender = is_sender;
         this.message = message;
+        this.date = date;
     }
 
 
