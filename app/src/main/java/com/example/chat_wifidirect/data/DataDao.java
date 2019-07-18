@@ -8,12 +8,14 @@ import androidx.room.Query;
 import androidx.room.Update;
 import com.example.chat_wifidirect.data.ChatJoinEntity;
 
+import java.util.List;
+
 
 @Dao
 public interface DataDao {
 
     @Query("SELECT * FROM chat")
-    ChatJoinEntity selectAll();
+    List<ChatJoinEntity> selectAll();
 
 
     @Query("SELECT * FROM chat where id=:id")
@@ -22,6 +24,24 @@ public interface DataDao {
 
     @Query("DELETE FROM chat where id=:i")
     void deleteChat(Long i);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long[] insertChat(ChatEntity chat);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertMessage(MessageEntity messageEntity);
+
+    @Query("select * from message where chat_id=:index")
+    List<MessageEntity> selectMessagesByChatId(long index);
+
+
+    @Query("select * from message")
+    List<MessageEntity> selectAllMassages();
+
+
+    @Query("select * from chat")
+    List<ChatEntity> selectAllChats();
+
 
 
 }
