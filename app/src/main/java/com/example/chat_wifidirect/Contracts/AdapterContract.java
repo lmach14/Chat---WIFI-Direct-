@@ -4,7 +4,5 @@ public interface AdapterContract {
     interface HistoryPageAdapterListener {
         void openChat(Long chatId);
         }
-    }
-
 
 }

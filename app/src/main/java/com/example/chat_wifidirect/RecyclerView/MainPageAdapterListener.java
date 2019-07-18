@@ -1,12 +1,18 @@
 package com.example.chat_wifidirect.RecyclerView;
 
 import com.example.chat_wifidirect.Contracts.AdapterContract;
+import com.example.chat_wifidirect.Contracts.MainPageContract;
 
 public class MainPageAdapterListener implements AdapterContract.HistoryPageAdapterListener {
 
-    MainPageAdapterListener()
+
+    MainPageContract.Presenter presenter;
+
+    public MainPageAdapterListener(MainPageContract.Presenter presenter) {
+        this.presenter = presenter;
+    }
     @Override
     public void openChat(Long chatId) {
-
+      //  presenter.
     }
 }
