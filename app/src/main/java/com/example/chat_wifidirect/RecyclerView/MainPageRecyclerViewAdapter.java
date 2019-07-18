@@ -45,6 +45,7 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
         holder.date.setText(model.getChat().getDate());
         holder.message_count.setText(model.getChat().getMessage_num());
 
+//        holder.setId(model.getChat().getId());
 
     }
 
@@ -63,11 +64,18 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
         TextView date;
         TextView message_count;
 
+//        void setListener(int id) {
+//
+//        }
+
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
+
             this.person = itemView.findViewById(R.id.chat_name);
             this.date = itemView.findViewById(R.id.create_date);
             this.message_count = itemView.findViewById(R.id.message_count);
+
+
 
         }
     }
