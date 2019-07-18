@@ -26,7 +26,7 @@ public interface DataDao {
     void deleteChat(Long i);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long[] insertChat(ChatEntity chat);
+    long insertChat(ChatEntity chat);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMessage(MessageEntity messageEntity);

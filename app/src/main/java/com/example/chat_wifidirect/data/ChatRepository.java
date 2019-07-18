@@ -38,7 +38,7 @@ public class ChatRepository {
         protected Void doInBackground(Object... object) {
             List<MessageEntity> t = (List<MessageEntity>) object[1];
             ChatEntity chat = (ChatEntity) object[0];
-            long i = dao.insertChat(chat)[0];
+            long i = dao.insertChat(chat);
             for (int j = 0; j < t.size(); j++) {
                 t.get(j).setChat_id(i);
                 dao.insertMessage(t.get(j));
