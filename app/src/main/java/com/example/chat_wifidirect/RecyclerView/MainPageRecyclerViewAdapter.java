@@ -1,6 +1,7 @@
 package com.example.chat_wifidirect.RecyclerView;
 
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chat_wifidirect.Contracts.AdapterContract;
 import com.example.chat_wifidirect.Models.ChatJoinModel;
+import com.example.chat_wifidirect.Models.ChatModel;
 import com.example.chat_wifidirect.R;
 
 import java.util.List;
 
 public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRecyclerViewAdapter.ChatViewHolder> {
 
-    List<ChatJoinModel> chats;
+    List<ChatModel> chats;
     AdapterContract.HistoryPageAdapterListener listener;
 
 
@@ -25,7 +27,7 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
         this.listener = listener;
     }
 
-    public MainPageRecyclerViewAdapter(List<ChatJoinModel> chats) {
+    public MainPageRecyclerViewAdapter(List<ChatModel> chats) {
         this.chats = chats;
     }
 
@@ -39,13 +41,14 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
 
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
-        ChatJoinModel model = chats.get(position);
+        ChatModel model = chats.get(position);
 
-        holder.person.setText(model.getChat().getName());
-        holder.date.setText(model.getChat().getDate());
-        holder.message_count.setText(model.getChat().getMessage_num());
+        holder.person.setText(model.getName());
+        holder.date.setText(model.getDate());
+        holder.message_count.setText(model.getMessage_num()+"");
 
-//        holder.setId(model.getChat().getId());
+        holder.setListener(model.getId());
+        holder.setLongClickListener(model.getId());
 
     }
 
@@ -54,20 +57,38 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
         return chats.size();
     }
 
-    public void updateSourse(List<ChatJoinModel> chats) {
+    public void updateSourse(List<ChatModel> chats) {
         this.chats = chats;
         notifyDataSetChanged();
     }
 
-    public class ChatViewHolder extends RecyclerView.ViewHolder {
+    public class ChatViewHolder extends RecyclerView.ViewHolder implements AdapterContract.AdapterObservable {
         TextView person;
         TextView date;
         TextView message_count;
 
-//        void setListener(int id) {
-//
-//        }
+        @Override
+        public void setListener(final int id) {
+            ((View)(person.getParent())).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.openChat((long) id);
+                }
+            });
+        }
 
+
+        @Override
+        public void setLongClickListener(final int id) {
+            ((View)(person.getParent())).setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    view.setBackgroundColor(Color.BLUE);
+                    listener.deleteChat((long)id);
+                    return true;
+                }
+            });
+        }
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
 

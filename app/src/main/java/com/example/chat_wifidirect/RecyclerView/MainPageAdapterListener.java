@@ -15,4 +15,9 @@ public class MainPageAdapterListener implements AdapterContract.HistoryPageAdapt
     public void openChat(Long chatId) {
       //  presenter.
     }
+
+    @Override
+    public void deleteChat(Long chatId) {
+        this.presenter.deleteChat(chatId, false);
+    }
 }

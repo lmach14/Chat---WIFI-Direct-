@@ -12,9 +12,15 @@ public class ChatRepository {
         dao = dataBase.dataDao();
     }
 
-    public List<ChatJoinEntity> getAllNotes() {
+    public List<ChatJoinEntity> getAll() {
         List<ChatJoinEntity> chatJoinEntities = dao.selectAll();
         return chatJoinEntities;
+    }
+
+
+    public List<ChatEntity> getAllChats() {
+        List<ChatEntity> chatEntities = dao.selectAllChats();
+        return chatEntities;
     }
 
 
@@ -22,6 +28,7 @@ public class ChatRepository {
         Object[] chatObjects = new Object[2];
         chatObjects[0] = chat;
         chatObjects[1] = messages;
+        new InsertChatAsyncTask(dao).doInBackground(chatObjects);
 
 
     }
@@ -39,11 +46,12 @@ public class ChatRepository {
             List<MessageEntity> t = (List<MessageEntity>) object[1];
             ChatEntity chat = (ChatEntity) object[0];
             long i = dao.insertChat(chat);
-            for (int j = 0; j < t.size(); j++) {
-                t.get(j).setChat_id(i);
-                dao.insertMessage(t.get(j));
+            if(t != null) {
+                for (int j = 0; j < t.size(); j++) {
+                    t.get(j).setChat_id(i);
+                    dao.insertMessage(t.get(j));
+                }
             }
-
             return null;
 
         }
