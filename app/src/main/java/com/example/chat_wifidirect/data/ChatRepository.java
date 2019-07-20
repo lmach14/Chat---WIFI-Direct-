@@ -3,6 +3,7 @@ package com.example.chat_wifidirect.data;
 import android.os.AsyncTask;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChatRepository {
     DataDao dao;
@@ -32,6 +33,21 @@ public class ChatRepository {
 
 
     }
+    
+    public void delete(long id) {
+        ChatJoinEntity chatMessage = dao.selectById(id);
+        Object[] chatObjects = new Object[2];
+        chatObjects[0] = chatMessage.getChatEntity();
+        chatObjects[1] = chatMessage.getMesageList();
+        new DeleteChatAsyncTask(dao).doInBackground(chatObjects);
+    }
+    
+
+    public void deleteAll() {
+        new  DeleteAllAsyncTask(dao).doInBackground();
+    }
+
+//    public void insertMesseages
 
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
@@ -54,6 +70,63 @@ public class ChatRepository {
             }
             return null;
 
+        }
+
+
+    }
+
+
+    private static class InsertMessageAsyncTask extends AsyncTask<Object, Void, Void> {
+        DataDao dao;
+
+        private InsertMessageAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+        
+        @Override
+        protected Void doInBackground(Object... objects) {
+            MessageEntity messageEntity = (MessageEntity)objects[0];
+            dao.insertMessage(messageEntity);
+            return null;
+        }
+    }
+
+    private static class DeleteChatAsyncTask extends AsyncTask<Object, Void, Void> {
+        DataDao dao;
+
+        private DeleteChatAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Object... objects) {
+
+            List<MessageEntity> t = (List<MessageEntity>) objects[1];
+            ChatEntity chat = (ChatEntity) objects[0];
+            List<MessageEntity> x1 = dao.selectMessagesByChatId(chat.getId());
+            dao.deleteChat(chat);
+//            for (:
+//                 ) {
+//
+//            }
+            List<MessageEntity> x = dao.selectMessagesByChatId(chat.getId());
+            return null;
+        }
+    }
+
+
+    private static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
+        DataDao dao;
+
+        private DeleteAllAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+            List<MessageEntity> x1 = dao.selectAllMassages();
+            dao.delelteAllChats();
+            List<MessageEntity> x = dao.selectAllMassages();
+            return null;
         }
 
 
