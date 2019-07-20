@@ -47,6 +47,8 @@ public class ChatRepository {
         new  DeleteAllAsyncTask(dao).doInBackground();
     }
 
+//    public void insertMesseages
+
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
         DataDao dao;
@@ -98,14 +100,16 @@ public class ChatRepository {
 
         @Override
         protected Void doInBackground(Object... objects) {
+
             List<MessageEntity> t = (List<MessageEntity>) objects[1];
             ChatEntity chat = (ChatEntity) objects[0];
+            List<MessageEntity> x1 = dao.selectMessagesByChatId(chat.getId());
             dao.deleteChat(chat);
 //            for (:
 //                 ) {
 //
 //            }
-//            List<MessageEntity> x = dao.selectMessagesByChatId(chat.getId());
+            List<MessageEntity> x = dao.selectMessagesByChatId(chat.getId());
             return null;
         }
     }
@@ -119,6 +123,7 @@ public class ChatRepository {
         }
         @Override
         protected Void doInBackground(Void... voids) {
+            List<MessageEntity> x1 = dao.selectAllMassages();
             dao.delelteAllChats();
             List<MessageEntity> x = dao.selectAllMassages();
             return null;

@@ -4,6 +4,7 @@ import com.example.chat_wifidirect.Contracts.MainPageContract;
 import com.example.chat_wifidirect.Models.ChatModel;
 import com.example.chat_wifidirect.data.ChatEntity;
 import com.example.chat_wifidirect.data.ChatRepository;
+import com.example.chat_wifidirect.data.MessageEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +20,8 @@ public class MainPagePresenter implements MainPageContract.Presenter {
 
 
 
-    public void insertChat(ChatEntity chatEntity) {
-        chatRepository.insert(chatEntity, null);
+    public void insertChat(ChatEntity chatEntity, List<MessageEntity> messageEntities) {
+        chatRepository.insert(chatEntity, messageEntities);
     }
 
     @Override

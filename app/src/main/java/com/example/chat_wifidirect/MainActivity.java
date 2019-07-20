@@ -29,8 +29,10 @@ import com.example.chat_wifidirect.Presenters.MainPagePresenter;
 import com.example.chat_wifidirect.RecyclerView.MainPageAdapterListener;
 import com.example.chat_wifidirect.RecyclerView.MainPageRecyclerViewAdapter;
 import com.example.chat_wifidirect.data.ChatEntity;
+import com.example.chat_wifidirect.data.MessageEntity;
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -65,14 +67,28 @@ public class MainActivity extends AppCompatActivity
         presenter = new MainPagePresenter(this);
 
         ChatEntity c1 = new ChatEntity("luka", "14/12/1223",12);
+
+        MessageEntity m1 = new MessageEntity(-1, "foo",true,"14/03/2019");
+        MessageEntity m2 = new MessageEntity(-1, "foo",false,"14/03/2019");
+        MessageEntity m3 = new MessageEntity(-1, "foo",true,"14/03/2019");
+        MessageEntity m4 = new MessageEntity(-1, "foo",false,"14/03/2019");
+        MessageEntity m5 = new MessageEntity(-1, "foo",true,"14/03/2019");
+
+        List<MessageEntity> ml = new ArrayList<>();
+        ml.add(m1);
+        ml.add(m2);
+        ml.add(m3);
+        ml.add(m4);
+        ml.add(m5);
+
         ChatEntity c2 = new ChatEntity("gela", "14/12/1223",12);
         ChatEntity c3 = new ChatEntity("bubu", "14/12/1223",15);
         ChatEntity c4 = new ChatEntity("shonzo", "14/12/1223",2);
 
-        ((MainPagePresenter) presenter).insertChat(c1);
-        ((MainPagePresenter) presenter).insertChat(c2);
-        ((MainPagePresenter) presenter).insertChat(c3);
-        ((MainPagePresenter) presenter).insertChat(c4);
+        ((MainPagePresenter) presenter).insertChat(c1,ml);
+        ((MainPagePresenter) presenter).insertChat(c2, null);
+        ((MainPagePresenter) presenter).insertChat(c3, null);
+        ((MainPagePresenter) presenter).insertChat(c4, null);
 
         List x = presenter.getChats();
         adapter = new MainPageRecyclerViewAdapter(presenter.getChats());
