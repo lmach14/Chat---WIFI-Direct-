@@ -33,6 +33,8 @@ public class MainPagePresenter implements MainPageContract.Presenter {
         return chats_m;
     }
 
+
+
     @Override
     public void deleteChat(long id, boolean agreed ) {
         if(!agreed) {
@@ -41,5 +43,11 @@ public class MainPagePresenter implements MainPageContract.Presenter {
             chatRepository.delete(id);
             activity.updateHistory();
         }
+    }
+
+    @Override
+    public void deleteAllChats() {
+        chatRepository.deleteAll();
+        activity.updateHistory();
     }
 }

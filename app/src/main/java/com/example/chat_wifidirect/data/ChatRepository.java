@@ -3,6 +3,7 @@ package com.example.chat_wifidirect.data;
 import android.os.AsyncTask;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ChatRepository {
     DataDao dao;
@@ -41,7 +42,10 @@ public class ChatRepository {
         new DeleteChatAsyncTask(dao).doInBackground(chatObjects);
     }
     
-    
+
+    public void deleteAll() {
+        new  DeleteAllAsyncTask(dao).doInBackground();
+    }
 
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
@@ -104,6 +108,23 @@ public class ChatRepository {
 //            List<MessageEntity> x = dao.selectMessagesByChatId(chat.getId());
             return null;
         }
+    }
+
+
+    private static class DeleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
+        DataDao dao;
+
+        private DeleteAllAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+            dao.delelteAllChats();
+            List<MessageEntity> x = dao.selectAllMassages();
+            return null;
+        }
+
+
     }
 
 }

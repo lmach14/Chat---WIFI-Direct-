@@ -81,6 +81,14 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+
+        findViewById(R.id.delete_all).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteAllChats();
+            }
+        });
+
     }
 
     @Override
@@ -130,6 +138,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void updateHistory() {
         adapter.updateSourse(presenter.getChats());
+    }
+
+    @Override
+    public void deleteAllChats() {
+        presenter.deleteAllChats();
     }
 
     public void deleteChat() {

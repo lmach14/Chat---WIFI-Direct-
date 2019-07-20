@@ -26,6 +26,10 @@ public interface DataDao {
     @Delete
     void deleteChat(ChatEntity chat);
 
+    @Query("DELETE from chat")
+    void delelteAllChats();
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertChat(ChatEntity chat);
 
