@@ -83,7 +83,7 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
             ((View)(person.getParent())).setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    view.setBackgroundColor(Color.BLUE);
+//                    view.setBackgroundColor(Color.BLUE);
                     listener.deleteChat((long)id);
                     return true;
                 }

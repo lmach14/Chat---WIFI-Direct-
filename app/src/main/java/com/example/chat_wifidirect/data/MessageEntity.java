@@ -3,9 +3,14 @@ package com.example.chat_wifidirect.data;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "message")
+@Entity(tableName = "message",
+        foreignKeys = @ForeignKey(entity = ChatEntity.class,
+                parentColumns = "id",
+                childColumns = "chat_id",
+                onDelete = ForeignKey.CASCADE))
 public class MessageEntity {
 
     @PrimaryKey(autoGenerate = true)

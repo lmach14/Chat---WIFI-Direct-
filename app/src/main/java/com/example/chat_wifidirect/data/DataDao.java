@@ -2,6 +2,7 @@ package com.example.chat_wifidirect.data;
 
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -22,8 +23,8 @@ public interface DataDao {
     ChatJoinEntity selectById(Long id);
 
 
-    @Query("DELETE FROM chat where id=:i")
-    void deleteChat(Long i);
+    @Delete
+    void deleteChat(ChatEntity chat);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertChat(ChatEntity chat);

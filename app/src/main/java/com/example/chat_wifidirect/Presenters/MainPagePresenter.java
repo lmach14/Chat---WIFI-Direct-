@@ -18,6 +18,7 @@ public class MainPagePresenter implements MainPageContract.Presenter {
     }
 
 
+
     public void insertChat(ChatEntity chatEntity) {
         chatRepository.insert(chatEntity, null);
     }
@@ -35,9 +36,10 @@ public class MainPagePresenter implements MainPageContract.Presenter {
     @Override
     public void deleteChat(long id, boolean agreed ) {
         if(!agreed) {
-            activity.showDeleteDialog();
+            activity.showDeleteDialog(id);
         } else {
-
+            chatRepository.delete(id);
+            activity.updateHistory();
         }
     }
 }

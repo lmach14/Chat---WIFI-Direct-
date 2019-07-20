@@ -32,6 +32,16 @@ public class ChatRepository {
 
 
     }
+    
+    public void delete(long id) {
+        ChatJoinEntity chatMessage = dao.selectById(id);
+        Object[] chatObjects = new Object[2];
+        chatObjects[0] = chatMessage.getChatEntity();
+        chatObjects[1] = chatMessage.getMesageList();
+        new DeleteChatAsyncTask(dao).doInBackground(chatObjects);
+    }
+    
+    
 
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
@@ -57,6 +67,43 @@ public class ChatRepository {
         }
 
 
+    }
+
+
+    private static class InsertMessageAsyncTask extends AsyncTask<Object, Void, Void> {
+        DataDao dao;
+
+        private InsertMessageAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+        
+        @Override
+        protected Void doInBackground(Object... objects) {
+            MessageEntity messageEntity = (MessageEntity)objects[0];
+            dao.insertMessage(messageEntity);
+            return null;
+        }
+    }
+
+    private static class DeleteChatAsyncTask extends AsyncTask<Object, Void, Void> {
+        DataDao dao;
+
+        private DeleteChatAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Object... objects) {
+            List<MessageEntity> t = (List<MessageEntity>) objects[1];
+            ChatEntity chat = (ChatEntity) objects[0];
+            dao.deleteChat(chat);
+//            for (:
+//                 ) {
+//
+//            }
+//            List<MessageEntity> x = dao.selectMessagesByChatId(chat.getId());
+            return null;
+        }
     }
 
 }

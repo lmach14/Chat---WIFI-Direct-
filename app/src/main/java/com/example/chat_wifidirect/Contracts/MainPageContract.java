@@ -4,7 +4,9 @@ import java.util.List;
 
 public interface MainPageContract {
     interface View {
-        void showDeleteDialog();
+        void showDeleteDialog(long id);
+        void updateHistory();
+
     }
 
     interface Presenter {
