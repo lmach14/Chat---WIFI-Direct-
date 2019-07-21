@@ -7,6 +7,7 @@ import java.util.List;
 public interface MessageContract {
     interface View extends ContractViews{
         void initRecyclerView(List<MessageModel> file);
+        void insertHeader(String name, String date);
         void back();
     }
 

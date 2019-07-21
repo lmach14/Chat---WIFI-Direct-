@@ -3,6 +3,7 @@ package com.example.chat_wifidirect.MessageActivity;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 
 import com.example.chat_wifidirect.Contracts.MessageContract;
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.chat_wifidirect.R;
 
@@ -31,6 +34,10 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     private RecyclerView recyclerView;
     private MessageRecyclerViewAdapter adapter;
     private MessagePagePresenter presenter;
+    private ImageView delete;
+    private ImageView back;
+    private TextView name;
+    private TextView date;
 
 
 
@@ -40,6 +47,10 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         setContentView(R.layout.activity_messages);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        delete = findViewById(R.id.delete_message);
+        back = findViewById(R.id.back);
+        name = findViewById(R.id.chat_name);
+        date = findViewById(R.id.chat_date);
 
         Bundle b = getIntent().getExtras();
         chat_id = b.getLong("chat_id");
@@ -48,16 +59,22 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
         presenter.start(chat_id);
 
-        toolbar.setOnClickListener(new View.OnClickListener() {
+        delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+//                Fragment prev = getFragmentManager().findFragmentByTag("dialog");
 
                 ft.addToBackStack(null);
 
                 MainActivity.DeleteChatDialog newFragment = MainActivity.DeleteChatDialog.newInstance(MessagesActivity.this);
                 newFragment.show(ft, "dialog");
+            }
+        });
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                back();
             }
         });
 
@@ -71,6 +88,13 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         adapter = new MessageRecyclerViewAdapter(this, file);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void insertHeader(String name, String date) {
+        this.name.setText(name);
+        this.date.setText(date);
+
     }
 
     @Override
