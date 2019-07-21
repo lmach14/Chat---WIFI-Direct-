@@ -5,12 +5,14 @@ import com.example.chat_wifidirect.Models.MessageModel;
 import java.util.List;
 
 public interface MessageContract {
-    interface View {
+    interface View extends ContractViews{
         void initRecyclerView(List<MessageModel> file);
+        void back();
     }
 
     interface Presenter {
         void start(Long id);
+        void deleteChat(long id);
 
     }
 }

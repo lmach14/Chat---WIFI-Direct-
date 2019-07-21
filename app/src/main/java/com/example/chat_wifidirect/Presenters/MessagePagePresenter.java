@@ -25,6 +25,13 @@ public class MessagePagePresenter implements MessageContract.Presenter {
     }
 
 
+    @Override
+    public void deleteChat(long id) {
+        chatRepository.delete(id);
+        view.back();
+    }
+
+
     public List getMessages(Long id) {
         List<MessageEntity> messages = chatRepository.selectMessagesByChatId(id);
         List<MessageModel> messages_model= new ArrayList<>();

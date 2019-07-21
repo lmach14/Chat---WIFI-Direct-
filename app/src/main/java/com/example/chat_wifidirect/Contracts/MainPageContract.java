@@ -3,7 +3,7 @@ package com.example.chat_wifidirect.Contracts;
 import java.util.List;
 
 public interface MainPageContract {
-    interface View {
+    interface View extends ContractViews {
         void showDeleteDialog(long id);
         void updateHistory();
         void deleteAllChats();

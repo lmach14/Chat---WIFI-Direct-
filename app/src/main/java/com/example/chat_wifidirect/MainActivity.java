@@ -25,6 +25,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chat_wifidirect.Contracts.ContractViews;
 import com.example.chat_wifidirect.Contracts.MainPageContract;
 import com.example.chat_wifidirect.MessageActivity.MessagesActivity;
 import com.example.chat_wifidirect.Presenters.MainPagePresenter;
@@ -43,10 +44,12 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainPageContract.View {
 
     private  MainPageContract.Presenter presenter;
-    private AtomicLong id;
+    public AtomicLong id;
     RecyclerView recyclerView;
     MainPageRecyclerViewAdapter adapter;
     Toolbar toolbar;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +115,12 @@ public class MainActivity extends AppCompatActivity
         toolbar.setTitle("ისტორია("+chats.size()+")");
 
 
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
 
     }
+
+
+
 
     @Override
     public void onBackPressed() {
@@ -188,8 +194,8 @@ public class MainActivity extends AppCompatActivity
 
     public static class DeleteChatDialog extends DialogFragment {
 
-        private static MainActivity parentActivity;
-        public static DeleteChatDialog newInstance(MainActivity parent) {
+        private static ContractViews parentActivity;
+        public static DeleteChatDialog newInstance(ContractViews parent) {
             parentActivity= parent;
             DeleteChatDialog f = new DeleteChatDialog();
             return f;
@@ -230,7 +236,8 @@ public class MainActivity extends AppCompatActivity
 //                String newName = et.getText().toString();
 //                rp.saveFile(newName, message, path);
                     parentActivity.deleteChat();
-                    getActivity().getSupportFragmentManager().popBackStack();
+
+                    ((AppCompatActivity)parentActivity).getSupportFragmentManager().popBackStack();
                 }
             });
 
@@ -238,7 +245,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onClick(View v) {
 
-                    getActivity().getSupportFragmentManager().popBackStack();
+                    ((AppCompatActivity)parentActivity).getSupportFragmentManager().popBackStack();
                 }
             });
         }
