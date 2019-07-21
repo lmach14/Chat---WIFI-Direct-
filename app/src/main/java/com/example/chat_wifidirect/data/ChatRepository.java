@@ -27,6 +27,7 @@ public class ChatRepository {
     public ChatJoinEntity getChatByid(Long id ) {
         return dao.selectById(id);
     }
+
     public void insert(ChatEntity chat, List<MessageEntity> messages) {
         Object[] chatObjects = new Object[2];
         chatObjects[0] = chat;
@@ -47,7 +48,10 @@ public class ChatRepository {
     public List<MessageEntity> selectMessagesByChatId(long index) {
         return dao.selectMessagesByChatId(index);
     }
-    
+
+    public String getChatNameByID(long id) {
+        return dao.getChatNameByID(id);
+    }
 
     public void deleteAll() {
         new  DeleteAllAsyncTask(dao).doInBackground();

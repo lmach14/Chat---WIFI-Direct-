@@ -14,6 +14,7 @@ public interface MessageContract {
     interface Presenter {
         void start(Long id);
         void deleteChat(long id);
+        String getChatNameByID(long id);
 
     }
 }

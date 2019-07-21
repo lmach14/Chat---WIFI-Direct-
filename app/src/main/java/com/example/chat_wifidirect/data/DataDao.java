@@ -22,6 +22,8 @@ public interface DataDao {
     @Query("SELECT * FROM chat where id=:id")
     ChatJoinEntity selectById(Long id);
 
+    @Query("SELECT name FROM chat where id=:id")
+    String getChatNameByID(long id);
 
     @Delete
     void deleteChat(ChatEntity chat);

@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity
 
         ft.addToBackStack(null);
 
-        DeleteChatDialog newFragment = DeleteChatDialog.newInstance(this);
+        DeleteChatDialog newFragment = DeleteChatDialog.newInstance(this, presenter.getChatNameByID(id));
         newFragment.show(ft, "dialog");
 
 
@@ -195,14 +195,18 @@ public class MainActivity extends AppCompatActivity
     public static class DeleteChatDialog extends DialogFragment {
 
         private static ContractViews parentActivity;
-        public static DeleteChatDialog newInstance(ContractViews parent) {
+        private static String name;
+
+        public static DeleteChatDialog newInstance(ContractViews parent, String name_chat) {
             parentActivity= parent;
             DeleteChatDialog f = new DeleteChatDialog();
+            name = name_chat;
             return f;
         }
 
         View yes;
         View no;
+
 
 
         @Override
@@ -215,6 +219,7 @@ public class MainActivity extends AppCompatActivity
         public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.delete_chat_pop_up, container, false);
             Activity act = getActivity();
+            ((TextView)(v.findViewById(R.id.pop_up_text))).setText("გსურთ " + name + "-თან მიმოწერის წაშლა?");
             yes = (Button)v.findViewById(R.id.yes);
             no = (Button)v.findViewById(R.id.no);
 

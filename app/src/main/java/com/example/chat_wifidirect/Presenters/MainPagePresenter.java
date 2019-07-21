@@ -39,6 +39,9 @@ public class MainPagePresenter implements MainPageContract.Presenter {
         return chats_m;
     }
 
+    public String getChatNameByID(long id) {
+        return chatRepository.getChatNameByID(id);
+    }
 
 
     @Override

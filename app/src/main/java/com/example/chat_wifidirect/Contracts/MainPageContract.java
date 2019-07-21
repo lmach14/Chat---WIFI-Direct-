@@ -16,5 +16,6 @@ public interface MainPageContract {
         List getChats();
         void deleteChat(long id, boolean agreed);
         void deleteAllChats();
+        String getChatNameByID(long id);
     }
 }

@@ -32,6 +32,11 @@ public class MessagePagePresenter implements MessageContract.Presenter {
 
 
     @Override
+    public String getChatNameByID(long id) {
+        return chatRepository.getChatNameByID(id);
+    }
+
+    @Override
     public void deleteChat(long id) {
         chatRepository.delete(id);
         view.back();

@@ -41,6 +41,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +68,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
                 ft.addToBackStack(null);
 
-                MainActivity.DeleteChatDialog newFragment = MainActivity.DeleteChatDialog.newInstance(MessagesActivity.this);
+                MainActivity.DeleteChatDialog newFragment = MainActivity.DeleteChatDialog.newInstance(MessagesActivity.this, presenter.getChatNameByID(chat_id));
                 newFragment.show(ft, "dialog");
             }
         });
@@ -81,6 +82,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
 
     }
+
+
 
 
     @Override
