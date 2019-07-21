@@ -1,7 +1,6 @@
 package com.example.chat_wifidirect.RecyclerView;
 
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chat_wifidirect.Contracts.AdapterContract;
-import com.example.chat_wifidirect.Models.ChatJoinModel;
 import com.example.chat_wifidirect.Models.ChatModel;
 import com.example.chat_wifidirect.R;
 
@@ -92,8 +90,8 @@ public class MainPageRecyclerViewAdapter extends RecyclerView.Adapter<MainPageRe
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            this.person = itemView.findViewById(R.id.chat_name);
-            this.date = itemView.findViewById(R.id.create_date);
+            this.person = itemView.findViewById(R.id.message_text);
+            this.date = itemView.findViewById(R.id.send_date);
             this.message_count = itemView.findViewById(R.id.message_count);
 
 

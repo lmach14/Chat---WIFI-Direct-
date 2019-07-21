@@ -35,11 +35,20 @@ public class MessageModel {
         this.message = message;
     }
 
-    public MessageModel(int id, long chat_id, boolean is_sender, String message) {
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public MessageModel(int id, long chat_id, boolean is_sender, String message, String date) {
         this.id = id;
         this.chat_id = chat_id;
         this.is_sender = is_sender;
         this.message = message;
+        this.date = date;
     }
 
     private long chat_id;
@@ -47,6 +56,8 @@ public class MessageModel {
     private boolean is_sender;
 
     private String message;
+
+    private String date;
 
 
 }

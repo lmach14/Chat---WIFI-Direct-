@@ -25,6 +25,11 @@ public class MainPagePresenter implements MainPageContract.Presenter {
     }
 
     @Override
+    public void openChatActivity(Long id, boolean isNew) {
+        activity.openActivity(id, isNew);
+    }
+
+    @Override
     public List getChats() {
         List<ChatEntity> chats = chatRepository.getAllChats();
         List<ChatModel> chats_m = new ArrayList<>();

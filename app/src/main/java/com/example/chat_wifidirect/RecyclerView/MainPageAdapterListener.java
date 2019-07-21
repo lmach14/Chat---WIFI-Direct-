@@ -13,7 +13,7 @@ public class MainPageAdapterListener implements AdapterContract.HistoryPageAdapt
     }
     @Override
     public void openChat(Long chatId) {
-      //  presenter.
+        presenter.openChatActivity(chatId, false);
     }
 
     @Override

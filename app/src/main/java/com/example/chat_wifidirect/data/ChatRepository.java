@@ -41,6 +41,10 @@ public class ChatRepository {
         chatObjects[1] = chatMessage.getMesageList();
         new DeleteChatAsyncTask(dao).doInBackground(chatObjects);
     }
+
+    public List<MessageEntity> selectMessagesByChatId(long index) {
+        return dao.selectMessagesByChatId(index);
+    }
     
 
     public void deleteAll() {

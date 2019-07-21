@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +23,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.example.chat_wifidirect.Contracts.MainPageContract;
+import com.example.chat_wifidirect.MessageActivity.MessagesActivity;
 import com.example.chat_wifidirect.Presenters.MainPagePresenter;
 import com.example.chat_wifidirect.RecyclerView.MainPageAdapterListener;
 import com.example.chat_wifidirect.RecyclerView.MainPageRecyclerViewAdapter;
@@ -159,6 +160,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void deleteAllChats() {
         presenter.deleteAllChats();
+    }
+
+    @Override
+    public void openActivity(Long id, boolean isNew) {
+        Intent myIntent = new Intent(MainActivity.this, MessagesActivity.class);
+        myIntent.putExtra("chat_id", id);
+        myIntent.putExtra("is_new", isNew);
+        MainActivity.this.startActivity(myIntent);
     }
 
     public void deleteChat() {
