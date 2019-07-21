@@ -81,7 +81,7 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             public boolean onLongClick(View view) {
                 TextView t = view.findViewById(R.id.send_date);
                 if(t.getVisibility() == View.VISIBLE) {
-                    t.setVisibility(View.INVISIBLE);
+                    t.setVisibility(View.GONE);
                 }else {
                     t.setVisibility(View.VISIBLE);
                 }
