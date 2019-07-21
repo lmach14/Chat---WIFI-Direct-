@@ -27,15 +27,6 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         this.items = items;
     }
 
-
-
-
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        mRecyclerView = recyclerView;
-    }
-
     @Override
     public int getItemViewType(int position) {
         if(items.get(position).isIs_sender()){
@@ -48,14 +39,23 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
 
 
     @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        mRecyclerView = recyclerView;
+    }
+
+
+
+
+    @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view;
         if(i == 1) {
-            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.message_text_layout, viewGroup, false);
-            return new ViewHolder(view);
+            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.message_text_layout_left, viewGroup, false);
+            return new ViewHolderLeft(view);
         }else {
-            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.message_text_layout, viewGroup, false);
-            return new ViewHolder(view);
+            view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.message_text_layout_right, viewGroup, false);
+            return new ViewHolderRight(view);
         }
     }
 
@@ -63,10 +63,31 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
+        View view;
+        if(viewHolder.getItemViewType() == 1) {
+            ViewHolderLeft holder = (ViewHolderLeft) viewHolder;
+            holder.message.setText(items.get(i).getMessage());
+            holder.date.setText(items.get(i).getDate());
+            view = holder.itemView;
+        }else {
+            ViewHolderRight holder = (ViewHolderRight) viewHolder;
+            holder.message.setText(items.get(i).getMessage());
+            holder.date.setText(items.get(i).getDate());
+            view = holder.itemView;
+        }
 
-        ViewHolder holder = (ViewHolder) viewHolder;
-        holder.message.setText(items.get(i).getMessage());
-        holder.date.setText(items.get(i).getDate());
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                TextView t = view.findViewById(R.id.send_date);
+                if(t.getVisibility() == View.VISIBLE) {
+                    t.setVisibility(View.INVISIBLE);
+                }else {
+                    t.setVisibility(View.VISIBLE);
+                }
+                return true;
+            }
+        });
 
     }
 
@@ -80,32 +101,28 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         }
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder{
+    public  class ViewHolderLeft extends RecyclerView.ViewHolder{
         private TextView message;
         private TextView date;
-//
-//        public void setListener(final NoteActyvity.NoteListener listener,final int id) {
-//            this.check_box.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    listener.check(id);
-//                }
-//            });
-//        }
-//        public void setTextListener(final NoteActyvity.NoteListener listener,final int id) {
-//            name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//
-//                @Override
-//                public void onFocusChange(View v, boolean hasFocus) {
-//                    if (!hasFocus) {
-//                        listener.updateText(id, name.getText().toString());
-//                    }
-//                }
-//            });
-//        }
+        private View itemView;
 
-        public ViewHolder(View itemView) {
+        public ViewHolderLeft(View itemView) {
             super(itemView);
+            this.itemView = itemView;
+            message = itemView.findViewById(R.id.message_text);
+            date = itemView.findViewById(R.id.send_date);
+
+        }
+    }
+
+    public  class ViewHolderRight extends RecyclerView.ViewHolder{
+        private TextView message;
+        private TextView date;
+        private View itemView;
+
+        public ViewHolderRight(View itemView) {
+            super(itemView);
+            this.itemView = itemView;
             message = itemView.findViewById(R.id.message_text);
             date = itemView.findViewById(R.id.send_date);
 
