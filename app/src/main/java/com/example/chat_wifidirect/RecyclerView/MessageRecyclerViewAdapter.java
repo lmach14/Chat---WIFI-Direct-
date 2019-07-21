@@ -18,6 +18,7 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private List<MessageModel> items;
     private Context con;
     private RecyclerView mRecyclerView;
+    private TextView lastDate;
 //    private NoteActyvity.NoteListener noteListener;
 
 
@@ -25,6 +26,7 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
         this.con = con;
 //        this.noteListener = noteListener;
         this.items = items;
+        lastDate = null;
     }
 
     @Override
@@ -80,6 +82,10 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             @Override
             public boolean onLongClick(View view) {
                 TextView t = view.findViewById(R.id.send_date);
+                if (lastDate != null && lastDate != t){
+                    lastDate.setVisibility(View.GONE);
+                }
+                lastDate = t;
                 if(t.getVisibility() == View.VISIBLE) {
                     t.setVisibility(View.GONE);
                 }else {
