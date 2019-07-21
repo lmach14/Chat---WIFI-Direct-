@@ -24,7 +24,9 @@ public class ChatRepository {
         return chatEntities;
     }
 
-
+    public ChatJoinEntity getChatByid(Long id ) {
+        return dao.selectById(id);
+    }
     public void insert(ChatEntity chat, List<MessageEntity> messages) {
         Object[] chatObjects = new Object[2];
         chatObjects[0] = chat;

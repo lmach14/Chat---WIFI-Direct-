@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -45,12 +46,13 @@ public class MainActivity extends AppCompatActivity
     private AtomicLong id;
     RecyclerView recyclerView;
     MainPageRecyclerViewAdapter adapter;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
@@ -91,8 +93,8 @@ public class MainActivity extends AppCompatActivity
         ((MainPagePresenter) presenter).insertChat(c3, null);
         ((MainPagePresenter) presenter).insertChat(c4, null);
 
-        List x = presenter.getChats();
-        adapter = new MainPageRecyclerViewAdapter(presenter.getChats());
+        List chats = presenter.getChats();
+        adapter = new MainPageRecyclerViewAdapter(chats);
 
         adapter.setChatListener(new MainPageAdapterListener(presenter));
         recyclerView.setAdapter(adapter);
@@ -105,6 +107,12 @@ public class MainActivity extends AppCompatActivity
                 deleteAllChats();
             }
         });
+
+
+        toolbar.setTitle("ისტორია("+chats.size()+")");
+
+
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
     }
 
@@ -154,12 +162,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void updateHistory() {
+        List list = presenter.getChats();
         adapter.updateSourse(presenter.getChats());
+        toolbar.setTitle("ისტორია("+list.size()+")");
     }
 
     @Override
     public void deleteAllChats() {
         presenter.deleteAllChats();
+        toolbar.setTitle("ისტორია("+0+")");
     }
 
     @Override

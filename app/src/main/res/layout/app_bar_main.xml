@@ -19,6 +19,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="ისტორია"/>
 
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_main" />
