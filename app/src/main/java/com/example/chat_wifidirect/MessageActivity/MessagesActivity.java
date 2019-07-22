@@ -63,7 +63,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
         Bundle b = getIntent().getExtras();
         chat_id = b.getLong("chat_id");
-        if(b.getBoolean("is_new")){ // aq unda not
+        if(!b.getBoolean("is_new")){
             input_text.setVisibility(View.GONE);
             send_message.setVisibility(View.GONE);
         }
@@ -88,6 +88,12 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
             @Override
             public void onClick(View view) {
                 back();
+            }
+        });
+        send_message.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                input_text.getText();
             }
         });
 
