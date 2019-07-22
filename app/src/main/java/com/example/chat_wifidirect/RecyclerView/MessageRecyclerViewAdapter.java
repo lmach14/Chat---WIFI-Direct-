@@ -78,9 +78,10 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             view = holder.itemView;
         }
 
-        view.setOnLongClickListener(new View.OnLongClickListener() {
+        view.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public boolean onLongClick(View view) {
+            public void onClick(View view) {
                 TextView t = view.findViewById(R.id.send_date);
                 if (lastDate != null && lastDate != t){
                     lastDate.setVisibility(View.GONE);
@@ -91,7 +92,6 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
                 }else {
                     t.setVisibility(View.VISIBLE);
                 }
-                return true;
             }
         });
 

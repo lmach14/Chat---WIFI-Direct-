@@ -16,16 +16,20 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.chat_wifidirect.R;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.List;
 
@@ -38,6 +42,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     private ImageView back;
     private TextView name;
     private TextView date;
+    private ImageView send_message;
+    private TextInputEditText input_text;
 
 
 
@@ -52,12 +58,18 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         back = findViewById(R.id.back);
         name = findViewById(R.id.chat_name);
         date = findViewById(R.id.chat_date);
+        send_message = findViewById(R.id.send_message);
+        input_text = findViewById(R.id.input_message);
 
         Bundle b = getIntent().getExtras();
         chat_id = b.getLong("chat_id");
+        if(b.getBoolean("is_new")){ // aq unda not
+            input_text.setVisibility(View.GONE);
+            send_message.setVisibility(View.GONE);
+        }
         recyclerView = findViewById(R.id.message_page_recycler);
         presenter = new MessagePagePresenter(this);
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         presenter.start(chat_id);
 
         delete.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +103,14 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         adapter = new MessageRecyclerViewAdapter(this, file);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
+        recyclerView.post(new Runnable() {
+            @Override
+            public void run() {
+                int end = adapter.getItemCount() - 1;
+                if (end > -1)
+                    recyclerView.smoothScrollToPosition(end);
+            }
+        });
     }
 
     @Override

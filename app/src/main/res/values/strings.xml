@@ -8,4 +8,5 @@
     <string name="menu_home">ჩატი</string>
     <string name="menu_gallery">ისტორია</string>
     <string name="title_activity_messages">MessagesActivity</string>
+    <string name="write_message">Type a message…</string>
 </resources>
