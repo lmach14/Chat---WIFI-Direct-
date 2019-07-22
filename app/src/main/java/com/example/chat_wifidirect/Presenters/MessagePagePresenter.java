@@ -37,6 +37,12 @@ public class MessagePagePresenter implements MessageContract.Presenter {
     }
 
     @Override
+    public void postMessage(long id, String text, String date) {
+        chatRepository.insertMesseages(new MessageEntity(id,text,true,date));
+        view.postMessage(id);
+    }
+
+    @Override
     public void deleteChat(long id) {
         chatRepository.delete(id);
         view.back();
@@ -50,12 +56,5 @@ public class MessagePagePresenter implements MessageContract.Presenter {
             messages_model.add(new MessageModel(messageEntity.getId(), messageEntity.getChat_id(), messageEntity.isIs_sender(), messageEntity.getMessage(), messageEntity.getDate()));
         }
         return messages_model;
-    }
-
-
-    public void postMessage(Long id, String text, String date) {
-        chatRepository.insertMessage(new MessageEntity(id,text,true,date));
-//        view.
-
     }
 }

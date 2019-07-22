@@ -10,7 +10,6 @@ public interface AdapterContract {
         void setListener(final int id);
         void setLongClickListener(final int id);
     }
-
 }
 
 

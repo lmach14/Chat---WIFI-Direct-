@@ -53,17 +53,17 @@ public class ChatRepository {
         return dao.getChatNameByID(id);
     }
 
-    public void insertMessage(MessageEntity messageEntity) {
-        MessageEntity[] messageObjects = new MessageEntity[2];
-        messageObjects[0] = messageEntity;
-        new InsertChatAsyncTask(dao).doInBackground(messageObjects);
-    }
-
     public void deleteAll() {
         new  DeleteAllAsyncTask(dao).doInBackground();
     }
 
-//    public void insertMesseages
+
+
+   public void insertMesseages(MessageEntity messageEntity) {
+       Object[] chatObjects = new Object[1];
+       chatObjects[0] = messageEntity;
+        new InsertMessageAsyncTask(dao).doInBackground(chatObjects);
+   }
 
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
@@ -92,7 +92,7 @@ public class ChatRepository {
     }
 
 
-    private static class InsertMessageAsyncTask extends AsyncTask<MessageEntity, Void, Void> {
+    private static class InsertMessageAsyncTask extends AsyncTask<Object, Void, Void> {
         DataDao dao;
 
         private InsertMessageAsyncTask(DataDao dao) {
@@ -100,8 +100,8 @@ public class ChatRepository {
         }
         
         @Override
-        protected Void doInBackground(MessageEntity... object) {
-            MessageEntity messageEntity = (MessageEntity)object[0];
+        protected Void doInBackground(Object... objects) {
+            MessageEntity messageEntity = (MessageEntity)objects[0];
             dao.insertMessage(messageEntity);
             return null;
         }
