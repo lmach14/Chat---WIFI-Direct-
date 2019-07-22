@@ -248,6 +248,7 @@ public class MainActivity extends AppCompatActivity
         Intent myIntent = new Intent(MainActivity.this, MessagesActivity.class);
         myIntent.putExtra("chat_id", id);
         myIntent.putExtra("is_new", isNew);
+        finish();
         MainActivity.this.startActivity(myIntent);
     }
 

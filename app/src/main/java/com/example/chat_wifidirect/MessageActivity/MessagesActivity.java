@@ -106,7 +106,10 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        back();
+    }
 
     @Override
     public void initRecyclerView(List<MessageModel> file) {
@@ -133,6 +136,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     @Override
     public void back() {
         Intent myIntent = new Intent( MessagesActivity.this, MainActivity.class);
+        finish();
         this.startActivity(myIntent);
     }
 
