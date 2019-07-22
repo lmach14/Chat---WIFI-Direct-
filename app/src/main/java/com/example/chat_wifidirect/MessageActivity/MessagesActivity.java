@@ -31,6 +31,10 @@ import android.widget.TextView;
 import com.example.chat_wifidirect.R;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MessagesActivity extends AppCompatActivity implements MessageContract.View {
@@ -96,6 +100,16 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                 if(input_text.getTextSize() > 0 && !input_text.getText().toString().trim().isEmpty()) {
                     String input = input_text.getText().toString();
                     input_text.getText().clear();
+                    String date = Calendar.getInstance().getTime().toString();
+                    SimpleDateFormat input_d = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy");
+                    SimpleDateFormat output = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+                    try {
+                        Date oneWayTripDate = input_d.parse(date);
+                        presenter.postMessage(chat_id, input,output.format(oneWayTripDate));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                 Log.d("test", input + "  egaa");
                 }
             }
@@ -138,6 +152,12 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         Intent myIntent = new Intent( MessagesActivity.this, MainActivity.class);
         finish();
         this.startActivity(myIntent);
+    }
+
+    @Override
+    public void postMessage(long id) {
+        adapter.updateSourse(presenter.getMessages(id));
+        presenter.start(id);
     }
 
     @Override

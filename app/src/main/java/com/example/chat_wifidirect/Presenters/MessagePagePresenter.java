@@ -37,6 +37,12 @@ public class MessagePagePresenter implements MessageContract.Presenter {
     }
 
     @Override
+    public void postMessage(long id, String text, String date) {
+        chatRepository.insertMesseages(new MessageEntity(id,text,true,date));
+        view.postMessage(id);
+    }
+
+    @Override
     public void deleteChat(long id) {
         chatRepository.delete(id);
         view.back();

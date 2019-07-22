@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.chat_wifidirect.Models.ChatModel;
 import com.example.chat_wifidirect.Models.MessageModel;
 import com.example.chat_wifidirect.R;
 import java.util.List;
@@ -37,6 +38,12 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
             return 2;
         }
 
+    }
+
+
+    public void updateSourse(List<MessageModel> messageModel) {
+        this.items = messageModel;
+        notifyDataSetChanged();
     }
 
 

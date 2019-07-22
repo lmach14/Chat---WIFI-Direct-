@@ -57,7 +57,13 @@ public class ChatRepository {
         new  DeleteAllAsyncTask(dao).doInBackground();
     }
 
-//    public void insertMesseages
+
+
+   public void insertMesseages(MessageEntity messageEntity) {
+       Object[] chatObjects = new Object[1];
+       chatObjects[0] = messageEntity;
+        new InsertMessageAsyncTask(dao).doInBackground(chatObjects);
+   }
 
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
