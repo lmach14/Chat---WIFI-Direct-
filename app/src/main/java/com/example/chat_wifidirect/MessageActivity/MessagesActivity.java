@@ -1,5 +1,6 @@
 package com.example.chat_wifidirect.MessageActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -73,7 +74,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         }
         recyclerView = findViewById(R.id.message_page_recycler);
         presenter = new MessagePagePresenter(this);
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         presenter.start(chat_id);
 
         delete.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +96,23 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                 back();
             }
         });
+
+        input_text.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                final int end = adapter.getItemCount() - 1;
+
+                if (end > -1) {
+                    recyclerView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            recyclerView.scrollToPosition(end);
+                        }
+                    }, 100);
+                }
+                Log.d("test", "test");
+            }
+        });
         send_message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,16 +120,15 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                     String input = input_text.getText().toString();
                     input_text.getText().clear();
                     String date = Calendar.getInstance().getTime().toString();
-                    SimpleDateFormat input_d = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy");
-                    SimpleDateFormat output = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat input_d = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzzz yyyy");
+                    @SuppressLint("SimpleDateFormat") SimpleDateFormat output = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
                     try {
-                        Date oneWayTripDate = input_d.parse(date);
-                        presenter.postMessage(chat_id, input,output.format(oneWayTripDate));
+                        Date input_date = input_d.parse(date);
+                        presenter.postMessage(chat_id, input,output.format(input_date));
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
 
-                Log.d("test", input + "  egaa");
                 }
             }
         });
@@ -129,15 +147,10 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     public void initRecyclerView(List<MessageModel> file) {
         adapter = new MessageRecyclerViewAdapter(this, file);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+        int end = adapter.getItemCount() - 1;
+        if (end > -1)
+            recyclerView.scrollToPosition(end);
         recyclerView.setAdapter(adapter);
-        recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                int end = adapter.getItemCount() - 1;
-                if (end > -1)
-                    recyclerView.smoothScrollToPosition(end);
-            }
-        });
     }
 
     @Override

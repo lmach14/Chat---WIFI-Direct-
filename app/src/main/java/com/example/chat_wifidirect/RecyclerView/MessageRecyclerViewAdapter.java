@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.chat_wifidirect.Models.ChatModel;
 import com.example.chat_wifidirect.Models.MessageModel;
 import com.example.chat_wifidirect.R;
 import java.util.List;
@@ -20,12 +19,10 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     private Context con;
     private RecyclerView mRecyclerView;
     private TextView lastDate;
-//    private NoteActyvity.NoteListener noteListener;
 
 
-    public MessageRecyclerViewAdapter(Context con, List<MessageModel> items) { //, NoteActyvity.NoteListener noteListener
+    public MessageRecyclerViewAdapter(Context con, List<MessageModel> items) {
         this.con = con;
-//        this.noteListener = noteListener;
         this.items = items;
         lastDate = null;
     }
@@ -33,9 +30,9 @@ public class MessageRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVie
     @Override
     public int getItemViewType(int position) {
         if(items.get(position).isIs_sender()){
-            return 1;
-        } else {
             return 2;
+        } else {
+            return 1;
         }
 
     }
