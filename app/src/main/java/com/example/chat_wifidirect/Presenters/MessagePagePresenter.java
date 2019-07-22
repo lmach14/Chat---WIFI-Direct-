@@ -51,4 +51,11 @@ public class MessagePagePresenter implements MessageContract.Presenter {
         }
         return messages_model;
     }
+
+
+    public void postMessage(Long id, String text, String date) {
+        chatRepository.insertMessage(new MessageEntity(id,text,true,date));
+//        view.
+
+    }
 }
