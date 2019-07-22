@@ -9,6 +9,7 @@ public interface MessageContract {
         void initRecyclerView(List<MessageModel> file);
         void insertHeader(String name, String date);
         void back();
+        void postMessage();
     }
 
     interface Presenter {

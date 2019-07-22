@@ -63,7 +63,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
         Bundle b = getIntent().getExtras();
         chat_id = b.getLong("chat_id");
-        if(b.getBoolean("is_new")){ // aq unda not
+        if(b.getBoolean("is_new")){
             input_text.setVisibility(View.GONE);
             send_message.setVisibility(View.GONE);
         }
@@ -90,6 +90,16 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                 back();
             }
         });
+        send_message.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(input_text.getTextSize() > 0 && !input_text.getText().toString().trim().isEmpty()) {
+                    String input = input_text.getText().toString();
+                    input_text.getText().clear();
+                    Log.d("test", input + "  egaa");
+                }
+            }
+        });
 
 
 
@@ -97,6 +107,10 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
 
 
+    @Override
+    public void onBackPressed() {
+        back();
+    }
 
     @Override
     public void initRecyclerView(List<MessageModel> file) {
@@ -123,7 +137,13 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     @Override
     public void back() {
         Intent myIntent = new Intent( MessagesActivity.this, MainActivity.class);
+        finish();
         this.startActivity(myIntent);
+    }
+
+    @Override
+    public void postMessage() {
+
     }
 
     @Override
