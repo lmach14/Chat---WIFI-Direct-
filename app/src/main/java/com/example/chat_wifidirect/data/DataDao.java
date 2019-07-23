@@ -25,6 +25,8 @@ public interface DataDao {
     @Query("SELECT name FROM chat where id=:id")
     String getChatNameByID(long id);
 
+
+
     @Delete
     void deleteChat(ChatEntity chat);
 
@@ -48,6 +50,14 @@ public interface DataDao {
 
     @Query("select * from chat")
     List<ChatEntity> selectAllChats();
+
+
+    @Query("select * from chat where id =:index")
+    ChatEntity getChatById(long index);
+
+
+    @Update
+    int updateChat(ChatEntity chatEntity);
 
 
 

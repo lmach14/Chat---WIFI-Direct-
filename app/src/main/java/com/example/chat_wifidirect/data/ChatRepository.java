@@ -2,6 +2,8 @@ package com.example.chat_wifidirect.data;
 
 import android.os.AsyncTask;
 
+import androidx.room.Update;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -60,10 +62,17 @@ public class ChatRepository {
 
 
    public void insertMesseages(MessageEntity messageEntity) {
-       Object[] chatObjects = new Object[1];
-       chatObjects[0] = messageEntity;
-        new InsertMessageAsyncTask(dao).doInBackground(chatObjects);
+       Object[] messageObjects = new Object[1];
+       messageObjects[0] = messageEntity;
+       new InsertMessageAsyncTask(dao).doInBackground(messageObjects);
+       ChatEntity currChat = dao.getChatById(messageEntity.getChat_id());
+       currChat.setMessage_num(currChat.getMessage_num() + 1);
+       new UpdateChatAsyncTask(dao).doInBackground(currChat);
+
    }
+
+
+
 
     private static class InsertChatAsyncTask extends AsyncTask<Object, Void, Void> {
 
@@ -106,6 +115,23 @@ public class ChatRepository {
             return null;
         }
     }
+
+    private static class UpdateChatAsyncTask extends AsyncTask<ChatEntity, Void, Void> {
+        DataDao dao;
+
+        private UpdateChatAsyncTask(DataDao dao) {
+            this.dao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(ChatEntity... objects) {
+            ChatEntity chatEntity = (ChatEntity) objects[0];
+            dao.updateChat(chatEntity);
+            return null;
+        }
+    }
+
+
 
     private static class DeleteChatAsyncTask extends AsyncTask<Object, Void, Void> {
         DataDao dao;
