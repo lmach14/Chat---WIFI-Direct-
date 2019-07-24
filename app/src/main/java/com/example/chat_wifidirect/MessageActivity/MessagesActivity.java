@@ -123,8 +123,6 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         send_message = findViewById(R.id.send_message);
         input_text = findViewById(R.id.input_message);
 
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
         this.chat_id = id;
         if (!is_new) {
             input_text.setVisibility(View.GONE);
@@ -134,7 +132,6 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
         recyclerView = findViewById(R.id.message_page_recycler);
         presenter = new MessagePagePresenter(this);
-//        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
 //        String chatName = b.getString("newChatName");
         String chatName = newChatName;
@@ -356,7 +353,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                             service.instanceName = instanceName;
                             service.serviceRegistrationType = registrationType;
                             DeviceName = srcDevice.deviceName;
-                            if(DeviceName == null) {
+                            if(DeviceName == null || DeviceName.equals("")) {
                                 appendStatus(DeviceName);
                                 DeviceName = "UNKNOWN";
                             }

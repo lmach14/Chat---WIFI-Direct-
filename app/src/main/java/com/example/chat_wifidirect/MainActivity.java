@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_history) {
             Log.d("test","" +  id);
         } else if (id == R.id.nav_home) {
             Intent myIntent = new Intent(MainActivity.this, MessagesActivity.class);
