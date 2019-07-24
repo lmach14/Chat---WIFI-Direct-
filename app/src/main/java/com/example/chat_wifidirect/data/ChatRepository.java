@@ -71,6 +71,10 @@ public class ChatRepository {
 
    }
 
+   public long insertNewChat(ChatEntity chatEntity) {
+        return dao.insertChat(chatEntity);
+   }
+
 
 
 

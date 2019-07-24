@@ -2,6 +2,7 @@ package com.example.chat_wifidirect.Presenters;
 
 import com.example.chat_wifidirect.Contracts.MessageContract;
 import com.example.chat_wifidirect.Models.MessageModel;
+import com.example.chat_wifidirect.data.ChatEntity;
 import com.example.chat_wifidirect.data.ChatJoinEntity;
 import com.example.chat_wifidirect.data.ChatRepository;
 import com.example.chat_wifidirect.data.MessageEntity;
@@ -37,8 +38,8 @@ public class MessagePagePresenter implements MessageContract.Presenter {
     }
 
     @Override
-    public void postMessage(long id, String text, String date) {
-        chatRepository.insertMesseages(new MessageEntity(id,text,true,date));
+    public void postMessage(long id, String text, String date, boolean isSender) {
+        chatRepository.insertMesseages(new MessageEntity(id,text,isSender,date));
         view.postMessage(id);
     }
 
@@ -46,6 +47,12 @@ public class MessagePagePresenter implements MessageContract.Presenter {
     public void deleteChat(long id) {
         chatRepository.delete(id);
         view.back();
+    }
+
+    @Override
+    public long insertChat(String name, String date, int message_num ) {
+        ChatEntity chatEntity = new ChatEntity(name,date,message_num);
+        return chatRepository.insertNewChat(chatEntity);
     }
 
 

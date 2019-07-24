@@ -16,7 +16,8 @@ public interface MessageContract {
         void start(Long id);
         void deleteChat(long id);
         String getChatNameByID(long id);
-        void postMessage(long id, String text, String date);
+        void postMessage(long id, String text, String date, boolean isSender);
+        public long insertChat(String name, String date, int message_num );
 
     }
 }
