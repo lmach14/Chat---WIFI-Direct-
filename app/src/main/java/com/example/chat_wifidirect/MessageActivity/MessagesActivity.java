@@ -81,7 +81,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     private TextView name;
     private TextView date;
     private ImageView send_message;
-    private TextInputEditText input_text;
+    private TextInputEditText input_text = null;
     /**********************************************/
 
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
@@ -123,7 +123,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         send_message = findViewById(R.id.send_message);
         input_text = findViewById(R.id.input_message);
 
-//        Bundle b = getIntent().getExtras();
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
         this.chat_id = id;
         if (!is_new) {
             input_text.setVisibility(View.GONE);
@@ -266,7 +267,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
     @Override
     public void back() {
-        input_text.clearFocus();
+        if (input_text != null)
+            input_text.clearFocus();
         Intent myIntent = new Intent( MessagesActivity.this, MainActivity.class);
         finish();
         this.startActivity(myIntent);
