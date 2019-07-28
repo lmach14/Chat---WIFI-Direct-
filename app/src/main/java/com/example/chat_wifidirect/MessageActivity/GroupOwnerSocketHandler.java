@@ -12,44 +12,37 @@ import java.util.concurrent.TimeUnit;
 class GroupOwnerSocketHandler extends Thread {
 
     ServerSocket socket = null;
-    private final int THREAD_COUNT = 10;
     private Handler handler;
-    private static final String TAG = "GroupOwnerSocketHandler";
+    private Thread thread;
     public GroupOwnerSocketHandler(Handler handler) throws IOException {
         try {
             socket = new ServerSocket(MessagesActivity.SERVER_PORT);
             this.handler = handler;
-            Log.d("GroupOwnerSocketHandler", "Socket Started");
         } catch (IOException e) {
+            socket.close();
             e.printStackTrace();
-            pool.shutdownNow();
             throw e;
         }
     }
-    /**
-     * A ThreadPool for client sockets.
-     */
-    private final ThreadPoolExecutor pool = new ThreadPoolExecutor(
-            THREAD_COUNT, THREAD_COUNT, 1, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>());
+
     @Override
     public void run() {
-        while (true) {
             try {
-                // A blocking operation. Initiate a ChatManager instance when
-                // there is a new connection
-                pool.execute(new ChatManager(socket.accept(), handler));
-                Log.d(TAG, "Launching the I/O handler");
+                ChatManager chatManager = new ChatManager(socket.accept(), handler);
+                thread = new Thread(chatManager);
+                thread.start();
             } catch (IOException e) {
                 try {
                     if (socket != null && !socket.isClosed())
                         socket.close();
                 } catch (IOException ioe) {
+
                 }
+                if(thread != null)
+                    thread.interrupt();
                 e.printStackTrace();
-                pool.shutdownNow();
-                break;
+
             }
-        }
+//        }
     }
 }

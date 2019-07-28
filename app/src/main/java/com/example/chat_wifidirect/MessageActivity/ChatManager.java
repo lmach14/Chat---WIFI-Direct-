@@ -11,13 +11,14 @@ import java.net.Socket;
 class ChatManager implements Runnable {
     private Socket socket = null;
     private Handler handler;
+
+
     public ChatManager(Socket socket, Handler handler) {
         this.socket = socket;
         this.handler = handler;
     }
     private InputStream iStream;
     private OutputStream oStream;
-    private static final String TAG = "ChatHandler";
     @Override
     public void run() {
         try {
@@ -25,41 +26,48 @@ class ChatManager implements Runnable {
             oStream = socket.getOutputStream();
             byte[] buffer = new byte[1024];
             int bytes;
-            handler.obtainMessage(MessagesActivity.MY_HANDLE, this)
-                    .sendToTarget();
+            handler.obtainMessage(MessagesActivity.MY_HANDLE, this).sendToTarget();
             while (true) {
                 try {
-                    // Read from the InputStream
+                    if(Thread.currentThread().isInterrupted())
+                        break;
                     bytes = iStream.read(buffer);
                     if (bytes == -1) {
                         break;
                     }
-                    // Send the obtained bytes to the UI Activity
-                    Log.d(TAG, "Rec:" + String.valueOf(buffer));
-                    handler.obtainMessage(MessagesActivity.MESSAGE_READ,
-                            bytes, -1, buffer).sendToTarget();
+                    handler.obtainMessage(MessagesActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
+                    Log.e("iStream_error", "disconnected", e);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
+                iStream.close();
+                oStream.close();
                 socket.close();
+                iStream = null;
+                oStream = null;
+                socket = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+
+
     public void write(String msg) {
+        if(oStream == null)
+            return;
         final byte[] buffer = msg.getBytes();
         Thread thread = new Thread() {
             public void run() {
                 try {
                     oStream.write(buffer);
                 } catch (IOException e) {
-                    Log.e(TAG, "Exception during write", e);
+                    Log.e("oStream_error", "Exception during write", e);
                 }
             }
         };

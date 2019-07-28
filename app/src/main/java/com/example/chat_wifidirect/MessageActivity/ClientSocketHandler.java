@@ -9,10 +9,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 class ClientSocketHandler extends Thread {
-    private static final String TAG = "ClientSocketHandler";
     private Handler handler;
     private ChatManager chat;
     private InetAddress mAddress;
+    private Thread thread;
+
     public ClientSocketHandler(Handler handler, InetAddress groupOwnerAddress) {
         this.handler = handler;
         this.mAddress = groupOwnerAddress;
@@ -24,9 +25,9 @@ class ClientSocketHandler extends Thread {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
                     MessagesActivity.SERVER_PORT), 5000);
-            Log.d(TAG, "Launching the I/O handler");
             chat = new ChatManager(socket, handler);
-            new Thread(chat).start();
+            thread = new Thread(chat);
+            thread.start();
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -34,10 +35,10 @@ class ClientSocketHandler extends Thread {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+            if(thread != null)
+                thread.interrupt();
             return;
         }
     }
-    public ChatManager getChat() {
-        return chat;
-    }
+
 }

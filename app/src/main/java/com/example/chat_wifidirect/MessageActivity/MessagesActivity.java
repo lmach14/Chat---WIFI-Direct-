@@ -1,5 +1,6 @@
 package com.example.chat_wifidirect.MessageActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.NotificationChannel;
@@ -9,11 +10,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.media.Image;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
@@ -69,9 +72,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MessagesActivity extends AppCompatActivity implements MessageContract.View, Handler.Callback, MessageTarget,
-        WifiP2pManager.ConnectionInfoListener , DeviceClickListener{
+public class MessagesActivity extends AppCompatActivity implements MessageContract.View{
     private Long chat_id;
     private RecyclerView recyclerView;
     private MessageRecyclerViewAdapter adapter;
@@ -83,31 +86,32 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     private ImageView send_message;
     private TextInputEditText input_text = null;
     /**********************************************/
-
+    private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 999;
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
     public static final String SERVICE_INSTANCE = "_wifidemotest";
     public static final String SERVICE_REG_TYPE = "_presence._tcp";
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
-    private WifiP2pManager manager;
-    static final int SERVER_PORT = 8888;
-    private final IntentFilter intentFilter = new IntentFilter();
+    WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
-    private BroadcastReceiver receiver = null;
-    private WifiP2pDnsSdServiceRequest serviceRequest;
-    private Handler handler = new Handler(this);
-    private String DeviceName;
-
+    private WifiP2pDnsSdServiceRequest wifiP2pServiceRequest;
+    public static int SERVER_PORT = 4545;
+    private WiFiDirectBroadcastReceiver receiver;
+    private IntentFilter intentFilter;
+    private TextView textView;
+    private WifiP2pDnsSdServiceInfo serviceInfo;
+    private AtomicBoolean isConnected = new AtomicBoolean(false);
+    private WifiDevice device;
+    TextView textView1;
     private ChatManager chatManager;
+    private TextView deviceName;
 
-    public void setHandler(Handler handler) {
-        this.handler = handler;
-    }
+
 
     /*****************************************************************
      *used material
      *https://android.googlesource.com/platform/development/+/master/samples/WiFiDirectServiceDiscovery?autodive=0%2F%2F
-     */
+     *****************************************************************/
 
     private void updateView(long id, boolean is_new, String newChatName) {
         setContentView(R.layout.activity_messages);
@@ -209,8 +213,16 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         Bundle b = getIntent().getExtras();
         if (b == null) {
             setContentView(R.layout.loading_peer);
-            addBroadcastListener();
-            turnOn();
+            deviceName = findViewById(R.id.connected_device);
+            findViewById(R.id.connect).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(device != null) {
+                        connect(device.device.deviceAddress);
+                    }
+                }
+            });
+            init();
 
         } else {
 
@@ -219,11 +231,6 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
         }
     }
-
-
-
-
-
 
 
     private String getDate() {
@@ -242,6 +249,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
     @Override
     public void onBackPressed() {
+        onStop();
+        unregisterReceiver(receiver);
         back();
     }
 
@@ -283,227 +292,419 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     }
 
 
-    private void addBroadcastListener() {
-        init();
-//        turnOn();
 
-    }
-
-    private void turnOn() {
-       
-    }
-
-
-    private void init() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Channel F name";
-            String description = "This is a description";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
-            NotificationChannel channel = new NotificationChannel( "com.example.TestP2P.notification" ,name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        intentFilter
-                .addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        intentFilter
-                .addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = manager.initialize(this, getMainLooper(), null);
-
-        startRegistrationAndDiscovery();
-    }
-
-    private void startRegistrationAndDiscovery() {
-        Map<String, String> record = new HashMap<>();
-        record.put(TXTRECORD_PROP_AVAILABLE, "visible");
-        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(
-                SERVICE_INSTANCE, SERVICE_REG_TYPE, record);
-        manager.addLocalService(channel, service, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                appendStatus("Added Local Service");
-            }
-
-            @Override
-            public void onFailure(int error) {
-                appendStatus("Failed to add a service");
-            }
-        });
-        discoverService();
-    }
-
-
-    private void discoverService() {
-        /*
-         * Register listeners for DNS-SD services. These are callbacks invoked
-         * by the system when a service is actually discovered.
-         */
-        manager.setDnsSdResponseListeners(channel,
-                new WifiP2pManager.DnsSdServiceResponseListener() {
-                    @Override
-                    public void onDnsSdServiceAvailable(String instanceName,
-                                                        String registrationType, WifiP2pDevice srcDevice) {
-                        if (instanceName.equalsIgnoreCase(SERVICE_INSTANCE)) {
-                            WiFiP2pService service = new WiFiP2pService();
-                            service.device = srcDevice;
-                            service.instanceName = instanceName;
-                            service.serviceRegistrationType = registrationType;
-                            DeviceName = srcDevice.deviceName;
-                            if(DeviceName == null || DeviceName.equals("")) {
-                                appendStatus(DeviceName);
-                                DeviceName = "UNKNOWN";
-                            }
-                            connectP2p(service);
-                        }
-                    }
-                }, new WifiP2pManager.DnsSdTxtRecordListener() {
-                    /**
-                     * A new TXT record is available. Pick up the advertised
-                     * buddy name.
-                     */
-                    @Override
-                    public void onDnsSdTxtRecordAvailable(
-                            String fullDomainName, Map<String, String> record,
-                            WifiP2pDevice device) {
-                        DeviceName = device.deviceName;
-                        Log.d("Tag",
-                                device.deviceName + " is "
-                                        + record.get(TXTRECORD_PROP_AVAILABLE));
-                    }
-                });
-        // After attaching listeners, create a service request and initiate
-        // discovery.
-        serviceRequest = WifiP2pDnsSdServiceRequest.newInstance();
-        manager.addServiceRequest(channel, serviceRequest,
-                new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        appendStatus("Added service discovery request");
-                    }
-                    @Override
-                    public void onFailure(int arg0) {
-                        appendStatus("Failed adding service discovery request");
-                    }
-                });
-        manager.discoverServices(channel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                appendStatus("Service discovery initiated");
-            }
-            @Override
-            public void onFailure(int arg0) {
-                appendStatus("Service discovery failed");
-            }
-        });
-    }
-
-
-
-    @Override
-    public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
-        Thread handler = null;
-        /*
-         * The group owner accepts connections using a server socket and then spawns a
-         * client socket for every client. This is handled by {@code
-         * GroupOwnerSocketHandler}
-         */
-        if (p2pInfo.isGroupOwner) {
-            Log.d("TAG", "Connected as group owner");
-            try {
-                handler = new GroupOwnerSocketHandler(
-                        ((MessageTarget) this).getHandler());
-                handler.start();
-            } catch (IOException e) {
-                Log.d("TAG",
-                        "Failed to create a server thread - " + e.getMessage());
-                return;
-            }
-        } else {
-            Log.d("TAG", "Connected as peer");
-            handler = new ClientSocketHandler(
-                    ((MessageTarget) this).getHandler(),
-                    p2pInfo.groupOwnerAddress);
-            handler.start();
-        }
-
-
-    }
-
-
-    @Override
-    public boolean handleMessage(@NonNull Message msg) {
-        switch (msg.what) {
-            case MESSAGE_READ:
-                byte[] readBuf = (byte[]) msg.obj;
-                // construct a string from the valid bytes in the buffer
-                String readMessage = new String(readBuf, 0, msg.arg1);
-                Log.d("TAG", readMessage);
-                presenter.postMessage(chat_id,readMessage,getDate(),false);
-//                (chatFragment).pushMessage("Buddy: " + readMessage);
-                break;
-            case MY_HANDLE:
-                Object obj = msg.obj;
-                chatManager = (ChatManager) obj;
-                updateView(-1, true, DeviceName);
-//                Log.d("TAG", );
-//                (chatFragment).setChatManager((ChatManager) obj);
-        }
-        return true;
-    }
-
-    @Override
-    public Handler getHandler() {
-        return handler;
-    }
 
 
     public void appendStatus(String status) {
         Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void connectP2p(WiFiP2pService service) {
+
+    private void init() {
+
+
+        manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = manager.initialize(this, getMainLooper(), null);
+        addIntentFilters();
+        /*add service info*/
+        Map record = new HashMap();
+        record.put("listenport", String.valueOf(SERVER_PORT));
+        record.put("buddyname", "John Doe" + (int) (Math.random() * 1000));
+        record.put("available", "visible");
+        serviceInfo =
+                WifiP2pDnsSdServiceInfo.newInstance("_test", "_presence._tcp", record);
+        addLocalService(serviceInfo);
+        addListenerForFoundService();
+        addServiceRequest();
+
+    }
+
+
+    /*add intent filters*/
+    private void addIntentFilters() {
+        intentFilter = new IntentFilter();
+        // Indicates a change in the Wi-Fi P2P status.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+
+        // Indicates a change in the list of available peers.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+
+        // Indicates the state of Wi-Fi P2P connectivity has changed.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+
+        // Indicates this device's details have changed.
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
+        {
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
+        }
+    }
+
+    /*add local service*/
+    private void addLocalService(final WifiP2pDnsSdServiceInfo serviceInfo) {
+        manager.clearLocalServices(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                manager.addLocalService(channel, serviceInfo, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onFailure(int i) {
+                        Log.d("addLocalService_fail",getDeviceStatus(i));
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int i) {
+                Log.d("clearLocalServices_fail",getDeviceStatus(i));
+            }
+        });
+
+    }
+
+
+    /*add Listeners for incoming service*/
+    private void addListenerForFoundService() {
+        manager.setDnsSdResponseListeners(channel,
+                new WifiP2pManager.DnsSdServiceResponseListener() {
+                    @Override
+                    public void onDnsSdServiceAvailable(String s, String s1, WifiP2pDevice wifiP2pDevice) {
+                        if(wifiP2pDevice!=null) {
+                            WifiDevice wifiDevice = new WifiDevice();
+                            wifiDevice.device.deviceName = wifiP2pDevice.deviceName == "" ? "Unknown" : wifiP2pDevice.deviceName;
+                            wifiDevice.device.deviceAddress = wifiP2pDevice.deviceAddress;
+                            wifiDevice.device.primaryDeviceType = wifiP2pDevice.primaryDeviceType;
+                            wifiDevice.instanceName = s;
+                            wifiDevice.serviceRegistrationType = s1;
+                            if (device == null) {
+                                device = wifiDevice;
+                                findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                                deviceName.setText(wifiDevice.device.deviceName );
+                            } else {
+                                if (device.device.deviceName != wifiDevice.device.deviceName) {
+                                    Log.d("sameDevice_error", device.device.deviceName + " => " + wifiDevice.device.deviceName);
+                                }
+
+
+                            }
+                        }
+
+                    }
+                }, new WifiP2pManager.DnsSdTxtRecordListener() {
+                    @Override
+                    public void onDnsSdTxtRecordAvailable(String s, Map<String, String> map, WifiP2pDevice wifiP2pDevice) {
+
+                    }
+                }
+        );
+        wifiP2pServiceRequest = WifiP2pDnsSdServiceRequest.newInstance();
+    }
+
+    /*request services*/
+    private void addServiceRequest() {
+        manager.clearServiceRequests(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                manager.addServiceRequest(channel, wifiP2pServiceRequest, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        manager.discoverServices(channel, new WifiP2pManager.ActionListener() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onFailure(int i) {
+                                Log.d("discoverServices_fail",getDeviceStatus(i));
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(int i) {
+                        Log.d("addServiceRequest_fail",getDeviceStatus(i));
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int i) {
+                Log.d("clearServiceReques_fail",getDeviceStatus(i));
+            }
+        });
+    }
+
+    /*remove group*/
+    public void removeGroup() {
+        manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+            @Override
+            public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {
+                if(wifiP2pGroup != null) {
+                    if(manager != null && channel != null) {
+                        manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+                            @Override
+                            public void onSuccess() {
+                                isConnected.set(false);
+                            }
+
+                            @Override
+                            public void onFailure(int i) {
+                                Log.d("removeGroup_fail",isConnected + " => " + getDeviceStatus(i));
+                                removeGroup();
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+
+    }
+
+    public static String getDeviceStatus(int statusCode) {
+        switch (statusCode){
+            case WifiP2pManager.BUSY:
+                return "busy";
+            case WifiP2pManager.ERROR:
+                return "error";
+            case WifiP2pManager.P2P_UNSUPPORTED:
+                return "p2p unsupported";
+            default:return "Unknown";
+        }
+    }
+
+    public boolean isManagerNull() {
+        return manager == null;
+    }
+
+    public boolean isConnected() {
+        return isConnected.get();
+    }
+
+    public void peerIsDesconected() {
+        onBackPressed();
+    }
+
+    public void afterConnectionAvailable() {
+
+        Log.d("Test","ტესტ");
+
+        manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+            @Override
+            public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {
+                if(wifiP2pGroup != null && device == null) {
+                    WifiP2pDevice wifiP2pDevice = (WifiP2pDevice)(wifiP2pGroup.getClientList().toArray()[0]);
+                    device = new WifiDevice();
+                    device.device.deviceName = wifiP2pDevice.deviceName == "" ? "Unknown" : wifiP2pDevice.deviceName;;
+                    device.device.deviceAddress = wifiP2pDevice.deviceAddress;
+                }
+            }
+        });
+
+        manager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
+
+
+            @Override
+            public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
+                Thread thread = null;
+
+                if (wifiP2pInfo.isGroupOwner) {
+                    try {
+                        thread = new GroupOwnerSocketHandler(handler);
+                        thread.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        onBackPressed();
+                        return;
+                    }
+
+                } else {
+                    thread = new ClientSocketHandler(
+                            handler,
+                            wifiP2pInfo.groupOwnerAddress);
+                    thread.start();
+                }
+
+            }
+        });
+        isConnected.set(true);
+    }
+
+    private void connectWifiDirect(final String deviceAddress) {
         WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = service.device.deviceAddress;
+        config.deviceAddress = deviceAddress;
         config.wps.setup = WpsInfo.PBC;
-        if (serviceRequest != null)
-            manager.removeServiceRequest(channel, serviceRequest,
+        if (wifiP2pServiceRequest != null)
+            manager.removeServiceRequest(channel, wifiP2pServiceRequest,
                     new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
+
                         }
+
                         @Override
-                        public void onFailure(int arg0) {
+                        public void onFailure(int i) {
+                            Log.d("removeServiceRequ_fail",getDeviceStatus(i));
                         }
                     });
         manager.connect(channel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                appendStatus("Connecting to service");
+
             }
             @Override
             public void onFailure(int errorCode) {
-                appendStatus("Failed connecting to service");
+                Log.d("connect_fail",getDeviceStatus(errorCode));
             }
         });
+
     }
 
+    public void connect(final String deviceAddress) {
+        if(isConnected.get()) {
+            manager.cancelConnect(channel, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    connectWifiDirect(deviceAddress);
+                }
+
+                @Override
+                public void onFailure(int i) {
+                    Log.d("cancelConnect_fail", getDeviceStatus(i));
+                }
+            });
+        } else {
+            connectWifiDirect(deviceAddress);
+        }
+    }
+
+    public void disconnect() {
+        if(isConnected.get()) {
+            manager.cancelConnect(channel, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    isConnected.set(false);
+
+                }
+
+                @Override
+                public void onFailure(int i) {
+                    Log.d("cancelConnect_fail", getDeviceStatus(i));
+                    removeGroup();
+                    manager.cancelConnect(channel, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            isConnected.set(false);
+
+                        }
+
+                        @Override
+                        public void onFailure(int i) {
+                            Log.d("cancelConnect2_fail", getDeviceStatus(i));
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    public void removeRequests() {
+        if(serviceInfo != null) {
+            manager.removeLocalService(channel, serviceInfo, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onFailure(int i) {
+                    Log.d("removeLocalService_fail", getDeviceStatus(i));
+                }
+            });
+        }
+        if(wifiP2pServiceRequest != null) {
+            manager.removeServiceRequest(channel, wifiP2pServiceRequest, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onFailure(int i) {
+                    Log.d("removeServiceRequ_fail", getDeviceStatus(i));
+                }
+            });
+        }
+    }
+
+
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            switch (message.what) {
+                case MESSAGE_READ:
+                    byte[] readBuf = (byte[]) message.obj;
+                    String readMessage = new String(readBuf, 0, message.arg1);
+                    presenter.postMessage(chat_id,readMessage,getDate(),false);
+                    break;
+                case MY_HANDLE:
+                    Object obj = message.obj;
+                    chatManager = ((ChatManager) obj);
+                    updateView(-1, true, device.device.deviceName);
+
+            }
+            return true;
+        }
+    });
+
+
+
+
+    @Override
+    protected void onStop() {
+
+        removeRequests();
+        disconnect();
+        removeGroup();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        onStop();
+        super.onDestroy();
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-        receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-        registerReceiver(receiver, intentFilter);
+        receiver = new WiFiDirectBroadcastReceiver(this);
+        try {
+            registerReceiver(receiver, intentFilter);
+        } catch (Exception e) {
+
+        }
+
     }
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
-    }
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception e) {
 
+        }
+
+    }
 
 }
