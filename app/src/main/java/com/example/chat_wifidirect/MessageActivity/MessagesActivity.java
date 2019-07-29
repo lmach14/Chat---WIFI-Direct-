@@ -87,9 +87,6 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     private TextInputEditText input_text = null;
     /**********************************************/
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 999;
-    public static final String TXTRECORD_PROP_AVAILABLE = "available";
-    public static final String SERVICE_INSTANCE = "_wifidemotest";
-    public static final String SERVICE_REG_TYPE = "_presence._tcp";
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
     WifiP2pManager manager;
@@ -102,10 +99,10 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     private WifiP2pDnsSdServiceInfo serviceInfo;
     private AtomicBoolean isConnected = new AtomicBoolean(false);
     private WifiDevice device;
-    TextView textView1;
     private ChatManager chatManager;
     private TextView deviceName;
-
+    private boolean forChat = false;
+    Thread thread;
 
 
     /*****************************************************************
@@ -212,6 +209,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
         Bundle b = getIntent().getExtras();
         if (b == null) {
+            forChat = true;
             setContentView(R.layout.loading_peer);
             deviceName = findViewById(R.id.connected_device);
             findViewById(R.id.connect).setOnClickListener(new View.OnClickListener() {
@@ -220,6 +218,12 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                     if(device != null) {
                         connect(device.device.deviceAddress);
                     }
+                }
+            });
+            findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onBackPressed();
                 }
             });
             init();
@@ -249,8 +253,15 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
     @Override
     public void onBackPressed() {
-        onStop();
-        unregisterReceiver(receiver);
+        if(forChat) {
+            onStop();
+        }
+
+        try {
+            unregisterReceiver(receiver);
+        } catch (Exception e) {
+
+        }
         back();
     }
 
@@ -290,8 +301,6 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
     public void deleteChat() {
         presenter.deleteChat(chat_id);
     }
-
-
 
 
 
@@ -503,6 +512,8 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {
                 if(wifiP2pGroup != null && device == null) {
+                    if(wifiP2pGroup.getClientList().toArray().length == 0)
+                        return;
                     WifiP2pDevice wifiP2pDevice = (WifiP2pDevice)(wifiP2pGroup.getClientList().toArray()[0]);
                     device = new WifiDevice();
                     device.device.deviceName = wifiP2pDevice.deviceName == "" ? "Unknown" : wifiP2pDevice.deviceName;;
@@ -516,7 +527,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
-                Thread thread = null;
+                thread = null;
 
                 if (wifiP2pInfo.isGroupOwner) {
                     try {
@@ -537,7 +548,7 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
 
             }
         });
-        isConnected.set(true);
+
     }
 
     private void connectWifiDirect(final String deviceAddress) {
@@ -660,6 +671,22 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
                 case MY_HANDLE:
                     Object obj = message.obj;
                     chatManager = ((ChatManager) obj);
+                    isConnected.set(true);
+                    if(device == null) {
+                        manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                            @Override
+                            public void onGroupInfoAvailable(WifiP2pGroup wifiP2pGroup) {
+                                if(wifiP2pGroup != null && device == null) {
+                                    if(wifiP2pGroup.getClientList().toArray().length == 0)
+                                        return;
+                                    WifiP2pDevice wifiP2pDevice = (WifiP2pDevice)(wifiP2pGroup.getClientList().toArray()[0]);
+                                    device = new WifiDevice();
+                                    device.device.deviceName = wifiP2pDevice.deviceName == "" ? "Unknown" : wifiP2pDevice.deviceName;;
+                                    device.device.deviceAddress = wifiP2pDevice.deviceAddress;
+                                }
+                            }
+                        });
+                    }
                     updateView(-1, true, device.device.deviceName);
 
             }
@@ -667,15 +694,13 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
         }
     });
 
-
-
-
     @Override
     protected void onStop() {
-
-        removeRequests();
-        disconnect();
-        removeGroup();
+        if(forChat) {
+            removeRequests();
+            disconnect();
+            removeGroup();
+        }
         super.onStop();
     }
 

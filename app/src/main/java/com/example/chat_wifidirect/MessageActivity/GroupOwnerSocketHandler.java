@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +20,8 @@ class GroupOwnerSocketHandler extends Thread {
             socket = new ServerSocket(MessagesActivity.SERVER_PORT);
             this.handler = handler;
         } catch (IOException e) {
-            socket.close();
+            if(socket != null)
+                socket.close();
             e.printStackTrace();
             throw e;
         }
@@ -27,14 +29,19 @@ class GroupOwnerSocketHandler extends Thread {
 
     @Override
     public void run() {
+            Socket client = null;
             try {
-                ChatManager chatManager = new ChatManager(socket.accept(), handler);
+                client = socket.accept();
+                ChatManager chatManager = new ChatManager(client, handler, socket);
                 thread = new Thread(chatManager);
                 thread.start();
             } catch (IOException e) {
                 try {
                     if (socket != null && !socket.isClosed())
                         socket.close();
+//                    if (client != null && !client.isClosed())
+//                        client.close();
+
                 } catch (IOException ioe) {
 
                 }

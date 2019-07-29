@@ -6,16 +6,19 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 class ChatManager implements Runnable {
     private Socket socket = null;
     private Handler handler;
+    private ServerSocket socketServer;
 
 
-    public ChatManager(Socket socket, Handler handler) {
+    public ChatManager(Socket socket, Handler handler, ServerSocket socketServer) {
         this.socket = socket;
         this.handler = handler;
+        this.socketServer = socketServer;
     }
     private InputStream iStream;
     private OutputStream oStream;
@@ -37,7 +40,9 @@ class ChatManager implements Runnable {
                     }
                     handler.obtainMessage(MessagesActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
+
                     Log.e("iStream_error", "disconnected", e);
+//                    break;
                 }
             }
         } catch (IOException e) {
@@ -47,6 +52,8 @@ class ChatManager implements Runnable {
                 iStream.close();
                 oStream.close();
                 socket.close();
+                if(socketServer != null)
+                    socketServer.close();
                 iStream = null;
                 oStream = null;
                 socket = null;
@@ -72,5 +79,20 @@ class ChatManager implements Runnable {
             }
         };
         thread.start();
+    }
+
+    public void close() {
+        try {
+            Thread.currentThread().interrupt();
+            iStream.close();
+            oStream.close();
+            socket.close();
+            iStream = null;
+            oStream = null;
+            socket = null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
