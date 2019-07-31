@@ -37,6 +37,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -352,7 +354,29 @@ public class MessagesActivity extends AppCompatActivity implements MessageContra
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
         }
+
+
+
+
+
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION: {
+                if(grantResults.length <= 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    onBackPressed();
+                }
+            }
+        }
+
+    }
+
+
+
+
 
     /*add local service*/
     private void addLocalService(final WifiP2pDnsSdServiceInfo serviceInfo) {

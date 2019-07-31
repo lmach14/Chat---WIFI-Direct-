@@ -28,7 +28,8 @@
             android:name=".MessageActivity.MessagesActivity"
             android:label=""
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateVisible|adjustResize">
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
